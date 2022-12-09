@@ -1,16 +1,14 @@
 use std::env;
 
-#[path = "day_1/day_1.rs"]
 mod day1;
 
-#[path = "day_2/day_2.rs"]
 mod day2;
 
-#[path = "day_3/day_3.rs"]
 mod day3;
 
-#[path = "day_4/day_4.rs"]
 mod day4;
+
+mod day5;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -37,6 +35,10 @@ fn main() {
         4 => {
             day4::puzzle1();
             day4::puzzle2();
+        }
+        5 => {
+            day5::puzzle1();
+            day5::puzzle2();
         }
         _ => {
             panic!("unkown day {}", day)
