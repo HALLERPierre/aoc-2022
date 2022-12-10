@@ -1,5 +1,4 @@
 import fs from "fs";
-import structuredClone from "@ungap/structured-clone";
 
 type Directory = {
   subdirectories: Directory[];
