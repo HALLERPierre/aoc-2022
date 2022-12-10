@@ -5,7 +5,7 @@ pub fn puzzle1() {
 }
 
 pub fn puzzle2() {
-    println!("1_ message begin at: {}", detect_sequence(INPUT, 14));
+    println!("2_ message begin at: {}", detect_sequence(INPUT, 14));
 }
 
 fn detect_sequence(signal: &str, length_signal: usize) -> usize {
