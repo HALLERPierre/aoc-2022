@@ -39,10 +39,7 @@ fn is_overlaping(ranges: ElveGroupRange) -> bool {
 }
 
 fn parse_range(range: &str) -> (i32, i32) {
-    let parsed_range: Vec<i32> = range
-        .split('-')
-        .map(|number| number.parse::<i32>().expect("should be integer"))
-        .collect();
+    let parsed_range: Vec<i32> = range .split('-') .map(|number| number.parse::<i32>().expect("should be integer")) .collect();
     let start_range = parsed_range.get(0).expect("should have start range");
     let end_range = parsed_range.get(1).expect("should have end range");
 

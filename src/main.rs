@@ -3,6 +3,8 @@ mod day1;
 mod day10;
 mod day11;
 mod day12;
+mod day13;
+mod day14;
 mod day2;
 mod day3;
 mod day4;
@@ -69,6 +71,14 @@ fn main() {
         12 => {
             day12::puzzle1();
             day12::puzzle2();
+        }
+        13 => {
+            day13::puzzle1();
+            day13::puzzle2();
+        }
+        14 => {
+            day14::puzzle1();
+            day14::puzzle2();
         }
         _ => {
             panic!("unkown day {}", day)
