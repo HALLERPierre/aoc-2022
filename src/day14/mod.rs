@@ -1,4 +1,5 @@
-use std::cmp;
+use std::time::Instant;
+use std::{cmp, collections::HashSet};
 const INPUT: &str = include_str!("./input");
 
 pub fn puzzle1() {
@@ -26,6 +27,7 @@ pub fn puzzle1() {
 }
 
 pub fn puzzle2() {
+    let now = Instant::now();
     let rocks = parse_rocks();
     let rocks_coords = get_rocks_coords(rocks);
     let floor = rocks_coords
@@ -35,38 +37,47 @@ pub fn puzzle2() {
         .expect("Should have a void")
         + 2;
 
-    let mut rocks_with_sand = rocks_coords.clone();
+    let mut rocks_with_sand: HashSet<(i32, i32)> = HashSet::new();
+    let mut rocks_x: HashSet<i32> = HashSet::new();
+    rocks_coords.iter().for_each(|coords| {
+        rocks_with_sand.insert(*coords);
+        rocks_x.insert(coords.0);
+    });
     let mut count_sand = 0;
     let mut is_spawn_blocked = false;
     while !is_spawn_blocked {
-        let (new_rocks, new_is_spawn_blocked) =
-            spawn_sand_with_floor(&rocks_with_sand, floor, (500 as i32, 0 as i32));
-        is_spawn_blocked = new_is_spawn_blocked;
+        is_spawn_blocked = spawn_sand_with_floor(
+            &mut rocks_with_sand,
+            &mut rocks_x,
+            floor,
+            (500 as i32, 0 as i32),
+        );
         count_sand += 1;
-        rocks_with_sand = new_rocks.clone();
-        println!("count_sand: {}", count_sand);
-        let last_rock = new_rocks.clone().pop();
-        println!("{:?}", last_rock);
     }
-    println!("There is {} units of sand to rest", count_sand)
+    println!("There is {} units of sand to rest", count_sand);
+    let elapsed = now.elapsed();
+    println!("Elapsed: {:.2?}", elapsed);
 }
 
-fn is_blocked(rocks: &Vec<(i32, i32)>, x: i32, y: i32, is_floor_reached: bool) -> bool {
-    let result = rocks.iter().any(|(rock_x, rock_y)| {
-        if is_floor_reached {
-            return *rock_x == x;
-        }
-        return *rock_x == x && *rock_y == y;
-    });
-    return result;
+fn is_blocked(
+    rocks: &HashSet<(i32, i32)>,
+    rocks_x: &HashSet<i32>,
+    x: i32,
+    y: i32,
+    is_floor_reached: bool,
+) -> bool {
+    if is_floor_reached {
+        return rocks_x.contains(&x);
+    }
+    return rocks.contains(&(x, y));
 }
 
 fn spawn_sand_with_floor(
-    rocks: &Vec<(i32, i32)>,
+    rocks: &mut HashSet<(i32, i32)>,
+    rocks_x: &mut HashSet<i32>,
     floor_y: i32,
     spawn_coords: (i32, i32),
-) -> (Vec<(i32, i32)>, bool) {
-    let mut new_rocks = rocks.clone();
+) -> bool {
     let mut moved = true;
     let mut current_coords = spawn_coords;
     while moved {
@@ -76,25 +87,23 @@ fn spawn_sand_with_floor(
         if is_floor_reached {
             break;
         }
-        if !is_blocked(rocks, x, down_y, is_floor_reached) {
+        if !is_blocked(rocks, rocks_x, x, down_y, is_floor_reached) {
             current_coords = (x, down_y);
             continue;
         }
-        if !is_blocked(rocks, x - 1, down_y, is_floor_reached) {
+        if !is_blocked(rocks, rocks_x, x - 1, down_y, is_floor_reached) {
             current_coords = (x - 1, down_y);
             continue;
         }
-        if !is_blocked(rocks, x + 1, down_y, is_floor_reached) {
+        if !is_blocked(rocks, rocks_x, x + 1, down_y, is_floor_reached) {
             current_coords = (x + 1, down_y);
             continue;
         }
         moved = false;
     }
-    new_rocks.push(current_coords);
-    return (
-        new_rocks,
-        current_coords.0 == spawn_coords.0 && current_coords.1 == spawn_coords.1,
-    );
+    rocks_x.insert(current_coords.0);
+    rocks.insert(current_coords);
+    return current_coords.0 == spawn_coords.0 && current_coords.1 == spawn_coords.1;
 }
 
 fn spawn_sand(
